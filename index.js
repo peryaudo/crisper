@@ -34,12 +34,13 @@ function split(source, jsFileName) {
   var scripts = dom5.queryAll(doc, inlineScriptFinder);
 
   var contents = [];
+  contents.push('document.addEventListener(\'DOMContentLoaded\',function(){');
   scripts.forEach(function(sn) {
 
     var nameAttr = sn.parentNode.attrs.filter(function(attr) { return attr.name === 'name'; })[0];
     var parentName = nameAttr ? nameAttr.value : '';
     contents.push('delete document._currentScript');
-    contents.push('document._currentScript = { parentNode: { getAttribute: function () { return \'' + parentName + '\'; } } }');
+    contents.push('document._currentScript = { parentNode: document.getElementsByName(\'' + parentName + '\')[0] }');
     var nidx = sn.parentNode.childNodes.indexOf(sn) + 1;
     var next = sn.parentNode.childNodes[nidx];
     dom5.remove(sn);
@@ -49,6 +50,7 @@ function split(source, jsFileName) {
     }
     contents.push(dom5.getTextContent(sn));
   });
+  contents.push('});');
 
   var newScript = dom5.constructors.element('script');
   dom5.setAttribute(newScript, 'src', jsFileName);
