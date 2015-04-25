@@ -38,7 +38,8 @@ function split(source, jsFileName) {
 
     var nameAttr = sn.parentNode.attrs.filter(function(attr) { return attr.name === 'name'; })[0];
     var parentName = nameAttr ? nameAttr.value : '';
-    contents.push('delete document._currentScript; document._currentScript = { parentNode: document.getElementsByName(\'' + parentName + '\')[0] }');
+    contents.push('delete document._currentScript');
+    contents.push('document._currentScript = { parentNode: { getAttribute: function () { return \'' + parentName + '\'; } } }');
     var nidx = sn.parentNode.childNodes.indexOf(sn) + 1;
     var next = sn.parentNode.childNodes[nidx];
     dom5.remove(sn);
