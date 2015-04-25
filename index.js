@@ -35,6 +35,7 @@ function split(source, jsFileName) {
 
   var contents = [];
   scripts.forEach(function(sn) {
+    contents.push('document._currentScript = document.getElementsByName(\'' + sn.parentNode.name + '\')[0]');
     var nidx = sn.parentNode.childNodes.indexOf(sn) + 1;
     var next = sn.parentNode.childNodes[nidx];
     dom5.remove(sn);
