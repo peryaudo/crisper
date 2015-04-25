@@ -33,28 +33,28 @@ function split(source, jsFileName) {
   var body = dom5.query(doc, pred.hasTagName('body'));
   var scripts = dom5.queryAll(doc, inlineScriptFinder);
 
+  var count = 0;
+
   var contents = [];
-  contents.push('document.addEventListener(\'DOMContentLoaded\',function(){');
   scripts.forEach(function(sn) {
 
     var nameAttr = sn.parentNode.attrs.filter(function(attr) { return attr.name === 'name'; })[0];
     var parentName = nameAttr ? nameAttr.value : '';
-    contents.push('delete document._currentScript');
-    contents.push('document._currentScript = { parentNode: document.getElementsByName(\'' + parentName + '\')[0] }');
+    contents.push('function cr' + count + '(){');
     var nidx = sn.parentNode.childNodes.indexOf(sn) + 1;
     var next = sn.parentNode.childNodes[nidx];
-    dom5.remove(sn);
-    // remove newline after script to get rid of nasty whitespace
-    if (next && dom5.isTextNode(next) && !/\S/.test(dom5.getTextContent(next))) {
-      dom5.remove(next);
-    }
+
     contents.push(dom5.getTextContent(sn));
+    contents.push('}');
+
+    dom5.setTextContent(sn, 'cr' + count + '();');
+
+    count++;
   });
-  contents.push('});');
 
   var newScript = dom5.constructors.element('script');
   dom5.setAttribute(newScript, 'src', jsFileName);
-  dom5.append(body, newScript);
+  head.childNodes.unshift(newScript);
 
   var html = dom5.serialize(doc);
   // newline + semicolon should be enough to capture all cases of concat
