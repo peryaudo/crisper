@@ -35,7 +35,10 @@ function split(source, jsFileName) {
 
   var contents = [];
   scripts.forEach(function(sn) {
-    contents.push('document._currentScript = document.getElementsByName(\'' + sn.parentNode.getAttribute('name') + '\')[0]');
+
+    var nameAttr = sn.parentNode.attrs.filter(function(attr) { return attr.name === 'name'; })[0];
+    var parentName = nameAttr ? nameAttr.value : '';
+    contents.push('document._currentScript = document.getElementsByName(\'' + parentName + '\')[0]');
     var nidx = sn.parentNode.childNodes.indexOf(sn) + 1;
     var next = sn.parentNode.childNodes[nidx];
     dom5.remove(sn);
